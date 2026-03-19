@@ -1,0 +1,27 @@
+{
+  "name": "greenhouse-recruiting-cli",
+  "version": "0.1.0",
+  "description": "CLI to interact with Greenhouse Recruiting (interview kits, scorecards)",
+  "type": "module",
+  "main": "build/index.js",
+  "bin": {
+    "greenhouse": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.3.3",
+    "vitest": "^2.1.9"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  }
+}
