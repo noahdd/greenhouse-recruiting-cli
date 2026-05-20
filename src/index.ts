@@ -19,6 +19,7 @@ import {
   getScorecard,
   getMyInterviews,
   getHtml,
+  getAllScorecards,
 } from "./client.js";
 
 function parseArgs(args: string[]) {
@@ -53,6 +54,12 @@ Usage:
   greenhouse scorecard <guide_id> <person_id> [--application-id <id>]
   greenhouse scorecard <greenhouse_url>
       Fetch scorecard form structure (questions, options, answer types)
+
+  greenhouse all-scorecards <guide_id> <person_id> [--application-id <id>]
+  greenhouse all-scorecards <greenhouse_url>
+      List every interviewer's scorecard for the application (stage,
+      interviewer, rating). Parses the "View Scorecards" data embedded
+      in the interview kit HTML.
 
   greenhouse my-interviews
       List your upcoming interviews from the dashboard
@@ -163,6 +170,22 @@ async function main() {
           process.exit(1);
         }
         result = await getScorecard(
+          args.guideId,
+          args.personId,
+          args.applicationId
+        );
+        break;
+      }
+
+      case "all-scorecards": {
+        const args = resolveKitArgs(positional, flags);
+        if (!args) {
+          console.error(
+            "Usage: greenhouse all-scorecards <guide_id> <person_id> [--application-id <id>]"
+          );
+          process.exit(1);
+        }
+        result = await getAllScorecards(
           args.guideId,
           args.personId,
           args.applicationId

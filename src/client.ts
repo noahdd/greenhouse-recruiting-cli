@@ -261,3 +261,51 @@ export const getScorecard = (
 export const getMyInterviews = () => getClient().getMyInterviews();
 
 export const getHtml = (path: string) => getClient().getHtml(path);
+
+// ─── All Scorecards ─────────────────────────────────────────────
+
+export interface ScorecardSummary {
+  interviewer: string;
+  interview: string;
+  rating: string;
+  scorecard_icon: string;
+  path: string | null;
+  edited: boolean;
+}
+
+/**
+ * Fetch every scorecard summary for a candidate's application.
+ *
+ * The "View scorecards" modal on the interview kit page embeds the full list
+ * as React props on a `data-react-class="InterviewKits.ViewScorecards"` div.
+ * We fetch the kit HTML and parse that JSON out.
+ */
+export async function getAllScorecards(
+  guideId: string,
+  personId: string,
+  applicationId?: string
+): Promise<ScorecardSummary[]> {
+  const qs = applicationId ? `?application_id=${applicationId}` : "";
+  const html = await getClient().getHtml(
+    `/guides/${guideId}/people/${personId}${qs}`
+  );
+
+  const match = html.match(
+    /data-react-class="InterviewKits\.ViewScorecards"\s+data-react-props="([^"]+)"/
+  );
+  if (!match) {
+    throw new Error(
+      "Could not find InterviewKits.ViewScorecards in kit HTML — page format may have changed, or you may not have permission to view other scorecards."
+    );
+  }
+
+  const decoded = match[1]
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#39;/g, "'");
+
+  const parsed = JSON.parse(decoded) as { scorecards: ScorecardSummary[] };
+  return parsed.scorecards;
+}
